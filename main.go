@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"context"
 	"io"
 	"log"
@@ -14,9 +15,26 @@ import (
 	"github.com/chromedp/chromedp"
 )
 
+func check(e error) {
+	if e != nil {
+		panic(e)
+	}
+}
+
 func main() {
 
+	//result_file := "./score_result.txt"
+	result_file := "./vne_result.txt"
+	f, err := os.OpenFile(result_file, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+
 	urls := bufio.NewReader(os.Stdin)
+	result, err := os.ReadFile(result_file)
+	check(err)
+
 	for {
 		url, err := urls.ReadString('\n')
 		if err != nil && err != io.EOF {
@@ -26,8 +44,10 @@ func main() {
 			break
 		}
 		url = strings.TrimSpace(url)
-		log.Printf("Start checking %s\n", url)
-		rank_vnexpress(url)
+		if !bytes.Contains(result, []byte(url)) {
+			log.Printf("Start checking %s\n", url)
+			rank_vnexpress(url)
+		}
 	}
 
 }
@@ -52,7 +72,7 @@ func click_n_get(url, js, comment_block_selector string) string {
 	defer cancel()
 
 	// create a timeout
-	ctx, cancel = context.WithTimeout(ctx, 30*time.Second)
+	ctx, cancel = context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 
 	err := chromedp.Run(ctx,
@@ -64,7 +84,8 @@ func click_n_get(url, js, comment_block_selector string) string {
 		//chromedp.WaitVisible(comment_block_selector, chromedp.ByQuery),
 
 		// wait for footer element is visible (ie, page is loaded)
-		chromedp.WaitVisible(`body > footer`),
+		//chromedp.WaitVisible(`body > footer`),
+		chromedp.WaitReady("body", chromedp.ByQuery),
 
 		// click show more comment . Don't know how to speed this up in js part yet
 		// Also can't make a simple loop here. Need to check chromedp syntax a bit
@@ -110,7 +131,7 @@ func rank_vnexpress(url string) {
 		number := s.Find(".number").Text()
 		if number != "" {
 			//fmt.Printf("Total like for this comment %s\n", number)
-			num, err := strconv.Atoi(number)
+			num, err := strconv.Atoi(strings.ReplaceAll(number, ".", ""))
 			if err != nil {
 				log.Fatal(err)
 			}
