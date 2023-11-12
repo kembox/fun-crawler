@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -88,4 +89,9 @@ func main() {
 	})
 	result[url] = total_likes
 	fmt.Println(result)
+
+	f, _ := os.Create("./result.txt")
+	for k, v := range result {
+		f.WriteString(k + ":" + strconv.Itoa(v) + "\n")
+	}
 }
