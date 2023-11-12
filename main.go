@@ -3,7 +3,7 @@ package main
 import (
 	"bufio"
 	"context"
-	"fmt"
+	"io"
 	"log"
 	"os"
 	"strconv"
@@ -19,14 +19,14 @@ func main() {
 	urls := bufio.NewReader(os.Stdin)
 	for {
 		url, err := urls.ReadString('\n')
-		if err != nil {
+		if err != nil && err != io.EOF {
 			log.Fatal(err)
 		}
 		if len(strings.TrimSpace(url)) == 0 {
 			break
 		}
-
-		fmt.Println("Start ranking vnexpress url")
+		url = strings.TrimSpace(url)
+		log.Printf("Start checking %s\n", url)
 		rank_vnexpress(url)
 	}
 
@@ -92,8 +92,6 @@ func rank_vnexpress(url string) {
 
 	comment := click_n_get(url, js, comment_block_selector)
 
-	fmt.Println("Finished chrome")
-
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(comment))
 	if err != nil {
 		log.Fatal(err)
@@ -115,9 +113,16 @@ func rank_vnexpress(url string) {
 	})
 
 	result[url] = total_likes
-	fmt.Printf("Result: %v\n", result)
+	//fmt.Printf("Result: %v\n", result)
+	log.Printf("%s:%d", url, result[url])
 
-	f, _ := os.Create("./result.txt")
+	filename := "./vne_result.txt"
+	f, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+	if err != nil {
+		panic(err)
+	}
+
+	defer f.Close()
 	for k, v := range result {
 		f.WriteString(k + ":" + strconv.Itoa(v) + "\n")
 	}
