@@ -1,11 +1,10 @@
-// Command click is a chromedp comment demonstrating how to use a selector to
-// click on an element.
 package main
 
 import (
 	"context"
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 	"time"
 
@@ -15,6 +14,7 @@ import (
 
 func main() {
 
+	//Nothing special, just to check how to manage defaults options
 	opts := append(chromedp.DefaultExecAllocatorOptions[:],
 		chromedp.NoDefaultBrowserCheck,
 	)
@@ -24,7 +24,10 @@ func main() {
 	defer browserCancel()
 
 	// create chrome instance
-	ctx, cancel := chromedp.NewContext(browserCtx)
+	ctx, cancel := chromedp.NewContext(
+		browserCtx,
+		//chromedp.WithDebugf(log.Printf),
+	)
 	defer cancel()
 
 	// create a timeout
@@ -34,13 +37,16 @@ func main() {
 	js := `
 		document.querySelector('.txt_666').click();
 	`
-	// navigate to a page, wait for an element, click
+
+	var result = make(map[string]int)
+	var total_likes int
 	var comment string
 	var empty_place_holder interface{}
+	var url string = `https://vnexpress.net/xuyen-dem-dau-gia-ba-mo-cat-o-ha-noi-4673746.html`
+
 	err := chromedp.Run(ctx,
-		//chromedp.Navigate(`https://pkg.go.dev/time`),
-		//chromedp.Navigate(`https://vnexpress.net/du-hoc-binh-dan-4673938.html`),
-		chromedp.Navigate(`https://vnexpress.net/xuyen-dem-dau-gia-ba-mo-cat-o-ha-noi-4673746.html`),
+
+		chromedp.Navigate(url),
 
 		// wait for comment box element is visible
 		chromedp.WaitVisible(`.box_comment_vne`, chromedp.ByQuery),
@@ -54,33 +60,32 @@ func main() {
 		chromedp.Evaluate(js, empty_place_holder),
 		chromedp.Sleep(time.Millisecond*50),
 
-		//chromedp.Text(`.box_comment_vne.width_common`, &comment, chromedp.ByQuery),
-		//chromedp.Text(`.box_comment_vne`, &comment, chromedp.ByQuery),
 		chromedp.OuterHTML(`.box_comment_vne`, &comment, chromedp.ByQuery),
 	)
+
 	if err != nil {
 		log.Fatal(err)
 	}
-	//log.Printf("%s", comment)
 
-	/*
-		    doc.Find(".left-content article .post-title").Each(func(i int, s *goquery.Selection) {
-				// For each item found, get the title
-				title := s.Find("a").Text()
-				fmt.Printf("Review %d: %s\n", i, title)
-			})
-	*/
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(comment))
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	//fmt.Println(comment)
+
 	doc.Find(".reactions-total").Each(func(i int, s *goquery.Selection) {
 		// For each item found, get the number
 		number := s.Find(".number").Text()
 		if number != "" {
-			fmt.Printf("Total like for this comment %s\n", number)
+			//fmt.Printf("Total like for this comment %s\n", number)
+			num, err := strconv.Atoi(number)
+			if err != nil {
+				log.Fatal(err)
+			}
+			total_likes += num
 		}
 	})
-	//fmt.Printf("%T\n", doc)
+	result[url] = total_likes
+	fmt.Println(result)
 }
