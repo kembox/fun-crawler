@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"fmt"
 	"log"
@@ -15,11 +16,30 @@ import (
 
 func main() {
 
+	urls := bufio.NewReader(os.Stdin)
+	for {
+		url, err := urls.ReadString('\n')
+		if err != nil {
+			log.Fatal(err)
+		}
+		if len(strings.TrimSpace(url)) == 0 {
+			break
+		}
+
+		fmt.Println("Start ranking vnexpress url")
+		rank_vnexpress(url)
+	}
+
+}
+
+func click_n_get(url, js, comment_block_selector string) string {
 	//Nothing special, just to check how to manage defaults options
+	var comment string
+	var empty_place_holder interface{}
+
 	opts := append(chromedp.DefaultExecAllocatorOptions[:],
 		chromedp.NoDefaultBrowserCheck,
 	)
-
 	// new browser, first tab
 	browserCtx, browserCancel := chromedp.NewExecAllocator(context.Background(), opts...)
 	defer browserCancel()
@@ -35,25 +55,16 @@ func main() {
 	ctx, cancel = context.WithTimeout(ctx, 15*time.Second)
 	defer cancel()
 
-	js := `
-		document.querySelector('.txt_666').click();
-	`
-
-	var result = make(map[string]int)
-	var total_likes int
-	var comment string
-	var empty_place_holder interface{}
-	var url string = `https://vnexpress.net/xuyen-dem-dau-gia-ba-mo-cat-o-ha-noi-4673746.html`
-
 	err := chromedp.Run(ctx,
 
 		chromedp.Navigate(url),
 
 		// wait for comment box element is visible
-		chromedp.WaitVisible(`.box_comment_vne`, chromedp.ByQuery),
-		//chromedp.WaitReady(`.box_comment_vne`, chromedp.ByQuery),
+		chromedp.WaitVisible(comment_block_selector, chromedp.ByQuery),
 
 		// click show more comment . Don't know how to speed this up in js part yet
+		// Also can't make a simple loop here. Need to check chromedp syntax a bit
+		// Look silly but ok
 		chromedp.Evaluate(js, empty_place_holder),
 		chromedp.Sleep(time.Millisecond*50),
 		chromedp.Evaluate(js, empty_place_holder),
@@ -61,12 +72,27 @@ func main() {
 		chromedp.Evaluate(js, empty_place_holder),
 		chromedp.Sleep(time.Millisecond*50),
 
-		chromedp.OuterHTML(`.box_comment_vne`, &comment, chromedp.ByQuery),
+		chromedp.OuterHTML(comment_block_selector, &comment, chromedp.ByQuery),
 	)
-
 	if err != nil {
 		log.Fatal(err)
 	}
+	return comment
+}
+
+func rank_vnexpress(url string) {
+	var result = make(map[string]int)
+	var total_likes int
+
+	js := `
+		document.querySelector('.txt_666').click();
+	`
+
+	comment_block_selector := `.box_comment_vne`
+
+	comment := click_n_get(url, js, comment_block_selector)
+
+	fmt.Println("Finished chrome")
 
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(comment))
 	if err != nil {
@@ -87,8 +113,9 @@ func main() {
 			total_likes += num
 		}
 	})
+
 	result[url] = total_likes
-	fmt.Println(result)
+	fmt.Printf("Result: %v\n", result)
 
 	f, _ := os.Create("./result.txt")
 	for k, v := range result {
