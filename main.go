@@ -38,7 +38,7 @@ func click_n_get(url, js, comment_block_selector string) string {
 	var empty_place_holder interface{}
 
 	opts := append(chromedp.DefaultExecAllocatorOptions[:],
-		chromedp.NoDefaultBrowserCheck,
+		chromedp.Flag("blink-settings", "imagesEnabled=false"),
 	)
 	// new browser, first tab
 	browserCtx, browserCancel := chromedp.NewExecAllocator(context.Background(), opts...)
@@ -52,7 +52,7 @@ func click_n_get(url, js, comment_block_selector string) string {
 	defer cancel()
 
 	// create a timeout
-	ctx, cancel = context.WithTimeout(ctx, 15*time.Second)
+	ctx, cancel = context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()
 
 	err := chromedp.Run(ctx,
@@ -60,7 +60,11 @@ func click_n_get(url, js, comment_block_selector string) string {
 		chromedp.Navigate(url),
 
 		// wait for comment box element is visible
-		chromedp.WaitVisible(comment_block_selector, chromedp.ByQuery),
+		//chromedp.WaitVisible(comment_block_selector, chromedp.ByQuery),
+		//chromedp.WaitVisible(comment_block_selector, chromedp.ByQuery),
+
+		// wait for footer element is visible (ie, page is loaded)
+		chromedp.WaitVisible(`body > footer`),
 
 		// click show more comment . Don't know how to speed this up in js part yet
 		// Also can't make a simple loop here. Need to check chromedp syntax a bit
@@ -72,7 +76,7 @@ func click_n_get(url, js, comment_block_selector string) string {
 		chromedp.Evaluate(js, empty_place_holder),
 		chromedp.Sleep(time.Millisecond*50),
 
-		chromedp.OuterHTML(comment_block_selector, &comment, chromedp.ByQuery),
+		chromedp.OuterHTML(`*`, &comment, chromedp.ByQuery),
 	)
 	if err != nil {
 		log.Fatal(err)
@@ -85,7 +89,9 @@ func rank_vnexpress(url string) {
 	var total_likes int
 
 	js := `
-		document.querySelector('.txt_666').click();
+		if (document.querySelector('.txt_666')) {
+			document.querySelector('.txt_666').click();
+		}
 	`
 
 	comment_block_selector := `.box_comment_vne`
