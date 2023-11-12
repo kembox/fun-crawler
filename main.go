@@ -21,10 +21,11 @@ func check(e error) {
 	}
 }
 
+var result_file = "./vne_result.txt"
+
 func main() {
 
 	//result_file := "./score_result.txt"
-	result_file := "./vne_result.txt"
 	f, err := os.OpenFile(result_file, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
 	if err != nil {
 		panic(err)
@@ -35,6 +36,8 @@ func main() {
 	result, err := os.ReadFile(result_file)
 	check(err)
 
+	// Read urls from input, check if we had result already to decide to get and score
+	// So we can resume from the previous run
 	for {
 		url, err := urls.ReadString('\n')
 		if err != nil && err != io.EOF {
@@ -46,13 +49,20 @@ func main() {
 		url = strings.TrimSpace(url)
 		if !bytes.Contains(result, []byte(url)) {
 			log.Printf("Start checking %s\n", url)
-			rank_vnexpress(url)
+			result, err := rank_vnexpress(url)
+			check(err)
+			for k, v := range result {
+				f.WriteString(k + ":" + strconv.Itoa(v) + "\n")
+			}
+			log.Printf("Done: %s:%d", url, result[url])
 		}
 	}
 
 }
 
-func click_n_get(url, js, comment_block_selector string) string {
+// Open chrome headless to navigate to a url
+// Perform a click action by a custom js file if needed
+func click_n_get(url, js string) string {
 	//Nothing special, just to check how to manage defaults options
 	var comment string
 	var empty_place_holder interface{}
@@ -79,12 +89,9 @@ func click_n_get(url, js, comment_block_selector string) string {
 
 		chromedp.Navigate(url),
 
-		// wait for comment box element is visible
-		//chromedp.WaitVisible(comment_block_selector, chromedp.ByQuery),
-		//chromedp.WaitVisible(comment_block_selector, chromedp.ByQuery),
-
-		// wait for footer element is visible (ie, page is loaded)
-		//chromedp.WaitVisible(`body > footer`),
+		//Wait for whole body to be ready
+		//The original method to wait for a special block comment only
+		//But there are too many edge case so I do it for sure
 		chromedp.WaitReady("body", chromedp.ByQuery),
 
 		// click show more comment . Don't know how to speed this up in js part yet
@@ -105,7 +112,7 @@ func click_n_get(url, js, comment_block_selector string) string {
 	return comment
 }
 
-func rank_vnexpress(url string) {
+func rank_vnexpress(url string) (map[string]int, error) {
 	var result = make(map[string]int)
 	var total_likes int
 
@@ -114,18 +121,14 @@ func rank_vnexpress(url string) {
 			document.querySelector('.txt_666').click();
 		}
 	`
-
-	comment_block_selector := `.box_comment_vne`
-
-	comment := click_n_get(url, js, comment_block_selector)
+	comment := click_n_get(url, js)
 
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(comment))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	//fmt.Println(comment)
-
+	//Parse html. Very vnexpress specific
 	doc.Find(".reactions-total").Each(func(i int, s *goquery.Selection) {
 		// For each item found, get the number
 		number := s.Find(".number").Text()
@@ -140,17 +143,5 @@ func rank_vnexpress(url string) {
 	})
 
 	result[url] = total_likes
-	//fmt.Printf("Result: %v\n", result)
-	log.Printf("%s:%d", url, result[url])
-
-	filename := "./vne_result.txt"
-	f, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
-	if err != nil {
-		panic(err)
-	}
-
-	defer f.Close()
-	for k, v := range result {
-		f.WriteString(k + ":" + strconv.Itoa(v) + "\n")
-	}
+	return result, nil
 }
