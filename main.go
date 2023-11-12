@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"context"
-	"io"
 	"log"
 	"os"
 	"strconv"
@@ -40,7 +39,7 @@ func main() {
 	// So we can resume from the previous run
 	for {
 		url, err := urls.ReadString('\n')
-		if err != nil && err != io.EOF {
+		if err != nil {
 			log.Fatal(err)
 		}
 		if len(strings.TrimSpace(url)) == 0 {
