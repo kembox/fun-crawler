@@ -244,6 +244,13 @@ func is_old_url(myurl string, date_jqSelector string) bool {
 	r, _ := regexp.Compile(`[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}`)
 
 	date := string(r.Find([]byte(article_date)))
+	if date == "" {
+		//There are url that doesn't have date info
+		//https://vnexpress.net/cam-nang-du-lich-can-gio-4673430.html
+		//Most likely ads so skip them
+		return true
+	}
+
 	date = standardize_date(date)
 
 	t_url, err := time.Parse("02/01/2006", date)
