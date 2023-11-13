@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -187,15 +188,32 @@ func click_n_get(url, js string, extra_wait_milisec int) string {
 	return body
 }
 
+func standardize_date(date string) string {
+	s := strings.Split(date, "/")
+	return fmt.Sprintf("%02s/%02s/%04s", string(s[0]), string(s[1]), string(s[2]))
+}
+
 func is_old_url(myurl string, date_jqSelector string) bool {
-	tmp_date := "/11/2023"
 	resp, err := http.Get(myurl)
 	if err != nil {
 		log.Println(err)
 	}
 	defer resp.Body.Close()
 	cdoc, _ := goquery.NewDocumentFromReader(resp.Body)
-	return !strings.Contains(cdoc.Find(date_jqSelector).Text(), tmp_date)
+	article_date := cdoc.Find(date_jqSelector).Text()
+	//fmt.Println("article date: ", article_date)
+
+	r, _ := regexp.Compile(`[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}`)
+
+	date := string(r.Find([]byte(article_date)))
+	date = standardize_date(date)
+
+	t_url, err := time.Parse("02/01/2006", date)
+	check(err)
+	t_lastweek := time.Now().AddDate(0, 0, -7)
+	//fmt.Println(t_url)
+	//fmt.Println(t_lastweek)
+	return t_url.Before(t_lastweek)
 }
 
 // Navigate to an url by chrome headless
