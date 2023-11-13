@@ -102,7 +102,7 @@ func main() {
 			log.Printf("Start checking %s\n", myurl)
 			score_result, err := like_collector(myurl, sites[hostname])
 			if err != nil {
-				fmt.Println(err)
+				log.Println(err)
 				continue
 			}
 			for k, v := range score_result {
