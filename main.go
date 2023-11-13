@@ -125,7 +125,7 @@ func rank_vnexpress(url string) (map[string]int, error) {
 	var result = make(map[string]int)
 	var total_likes int
 
-	resp, err := http.Get("http://example.com/")
+	resp, err := http.Get(url)
 	if err != nil {
 		log.Println(err)
 	}
