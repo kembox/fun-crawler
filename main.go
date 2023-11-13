@@ -88,7 +88,7 @@ func main() {
 
 // Open chrome headless to navigate to a url
 // Perform a click action by a custom js file if needed
-func click_n_get(url, js string) string {
+func click_n_get(url, js string, extra_wait_milisec int) string {
 	var comment string
 	var empty_place_holder interface{}
 
@@ -96,6 +96,7 @@ func click_n_get(url, js string) string {
 	opts := append(chromedp.DefaultExecAllocatorOptions[:],
 		chromedp.Flag("blink-settings", "imagesEnabled=false"),
 		chromedp.Flag("disable-gpu", true),
+		chromedp.Flag("disable-web-security", true),
 	)
 	// new browser, first tab
 	browserCtx, browserCancel := chromedp.NewExecAllocator(context.Background(), opts...)
@@ -126,6 +127,10 @@ func click_n_get(url, js string) string {
 			"https://*.vnecdn.net/*like.svg",
 			"https://vnexpress.net/microservice/*",
 			"https://my.vnexpress.net/*",
+			"https://*.admicro.vn/*",
+			"https://*.yomedia.vn/*",
+			"https://sb.scorecardresearch.com/*",
+			"https://*sohatv.vn/*",
 		}),
 		chromedp.Navigate(url),
 
@@ -141,11 +146,10 @@ func click_n_get(url, js string) string {
 		chromedp.Evaluate(js, empty_place_holder),
 		chromedp.Evaluate(js, empty_place_holder),
 		chromedp.Evaluate(js, empty_place_holder),
-		chromedp.Evaluate(js, empty_place_holder),
-		chromedp.Evaluate(js, empty_place_holder),
-		chromedp.Sleep(time.Millisecond*50),
+		chromedp.Sleep(time.Millisecond*time.Duration(extra_wait_milisec)),
+		chromedp.WaitVisible(`body`, chromedp.ByQuery),
 
-		chromedp.OuterHTML(`*`, &comment, chromedp.ByQuery),
+		chromedp.OuterHTML(`body`, &comment, chromedp.ByQuery),
 	)
 	if err != nil {
 		log.Fatal(err)
@@ -179,7 +183,9 @@ func rank_vnexpress(url string) (map[string]int, error) {
 			document.querySelector('.txt_666').click();
 		}
 	`
-	comment := click_n_get(url, js)
+	comment := click_n_get(url, js, 1)
+	//vnexpress doesn't need to have any extra wait.
+	//I put it 1 milliseconds here to satisfy function definition :|
 
 	//The selector that we use to select the needed content in console
 	//for example: document.querySelector(".number")
@@ -205,15 +211,15 @@ func rank_tuoitre(url string) (map[string]int, error) {
 			document.querySelector('.viewmore-comment').click();
 		}
 	`
-	fullbody := click_n_get(url, js)
-	//fmt.Println(fullbody)
+	fullbody := click_n_get(url, js, 2000)
+	//Tuoitre has some lazy load magic that chromedp can't just simply wait by matching selector
+	//I have to use this stupid trick :(
+	//Yes - 2 seconds is pretty safe
 
 	//The selector that we use to select the needed content in console
 	//for example: document.querySelector(".number")
-	//like_box_selector := ".totalreact"
-	//like_box_selector := ".listcm"
-	like_box_selector := ".wrapreact"
-	like_count_selector := ".totalreact"
+	like_box_selector := ".totalreact"
+	like_count_selector := ".total"
 	result[url] = count_likes(fullbody, like_box_selector, like_count_selector)
 
 	return result, nil
@@ -229,13 +235,10 @@ func count_likes(body_html, like_box_selector, like_count_selector string) (tota
 	}
 
 	//select 2 class to make sure it's the correct place to check
-	fmt.Println(doc.Find(".totalreact").Text())
 	doc.Find(like_box_selector).Each(func(i int, s *goquery.Selection) {
 		// For each item found, get the number
 		number := s.Find(like_count_selector).Text()
-		fmt.Println("number: ", number)
 		if number != "" {
-			fmt.Printf("Total like for this comment %s\n", number)
 			num, err := strconv.Atoi(strings.ReplaceAll(number, ".", ""))
 			if err != nil {
 				log.Fatal(err)
