@@ -9,6 +9,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"strconv"
 	"strings"
@@ -19,10 +20,29 @@ import (
 	"github.com/chromedp/chromedp"
 )
 
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
+type site_attributes struct {
+	button_querySelector     string
+	like_box_querySelector   string
+	like_count_querySelector string
+	date_querySelector       string
+	extra_wait_milisec       int
+}
+
+var sites map[string]site_attributes = map[string]site_attributes{
+	"vnexpress.net": {
+		button_querySelector:     ".txt_666",
+		like_box_querySelector:   ".reactions-total",
+		like_count_querySelector: ".number",
+		date_querySelector:       ".date",
+		extra_wait_milisec:       1,
+	},
+	"tuoitre.vn": {
+		button_querySelector:     ".viewmore-comment",
+		like_box_querySelector:   ".totalreact",
+		like_count_querySelector: ".total",
+		date_querySelector:       ".detail-time",
+		extra_wait_milisec:       2000,
+	},
 }
 
 /*
@@ -31,6 +51,12 @@ var checked_urls_file = "./checked_urls.txt"
 */
 var result_file = "./test_vne_result.txt"
 var checked_urls_file = "./test_checked_urls.txt"
+
+func check(e error) {
+	if e != nil {
+		panic(e)
+	}
+}
 
 func main() {
 
@@ -49,30 +75,32 @@ func main() {
 	checked_urls, cerr := os.ReadFile(checked_urls_file)
 	check(cerr)
 
-	urls := bufio.NewReader(os.Stdin)
+	myurls := bufio.NewReader(os.Stdin)
 
 	// Read urls from input, check if we had result already to decide to get and score
 	// So we can resume from the previous run
 	for {
-		url, err := urls.ReadString('\n')
+		myurl, err := myurls.ReadString('\n')
 		if err != nil {
 			if err == io.EOF {
 				break
 			}
 			log.Fatal(err)
 		}
-		if len(strings.TrimSpace(url)) == 0 {
+		if len(strings.TrimSpace(myurl)) == 0 {
 			break
 		}
-		url = strings.TrimSpace(url)
+		myurl = strings.TrimSpace(myurl)
+
+		hostname := get_hostname(myurl)
 
 		//Log url to checked list
-		fc.WriteString(url)
+		fmt.Println(myurl)
+		fc.WriteString(myurl)
 
-		if !bytes.Contains(checked_urls, []byte(url)) {
-			log.Printf("Start checking %s\n", url)
-			//score_result, err := rank_vnexpress(url)
-			score_result, err := rank_tuoitre(url)
+		if !bytes.Contains(checked_urls, []byte(myurl)) {
+			log.Printf("Start checking %s\n", myurl)
+			score_result, err := like_collector(myurl, sites[hostname])
 			if err != nil {
 				fmt.Println(err)
 				continue
@@ -80,7 +108,7 @@ func main() {
 			for k, v := range score_result {
 				f.WriteString(k + ":" + strconv.Itoa(v) + "\n")
 			}
-			log.Printf("Done: %s:%d", url, score_result[url])
+			log.Printf("Done: %s:%d", myurl, score_result[myurl])
 		}
 	}
 
@@ -89,8 +117,7 @@ func main() {
 // Open chrome headless to navigate to a url
 // Perform a click action by a custom js file if needed
 func click_n_get(url, js string, extra_wait_milisec int) string {
-	var comment string
-	var empty_place_holder interface{}
+	var body string
 
 	//Set browser options
 	opts := append(chromedp.DefaultExecAllocatorOptions[:],
@@ -142,90 +169,61 @@ func click_n_get(url, js string, extra_wait_milisec int) string {
 		// click show more comment . Don't know how to speed this up in js part yet
 		// Also can't make a simple loop here. Need to check chromedp syntax a bit
 		// Look silly but ok
-		chromedp.Evaluate(js, empty_place_holder),
-		chromedp.Evaluate(js, empty_place_holder),
-		chromedp.Evaluate(js, empty_place_holder),
-		chromedp.Evaluate(js, empty_place_holder),
+		//chromedp.Evaluate(js, empty_place_holder),
+		chromedp.Evaluate(js, nil),
+		chromedp.Evaluate(js, nil),
+		chromedp.Evaluate(js, nil),
+		chromedp.Evaluate(js, nil),
 		chromedp.Sleep(time.Millisecond*time.Duration(extra_wait_milisec)),
 		chromedp.WaitVisible(`body`, chromedp.ByQuery),
 
-		chromedp.OuterHTML(`body`, &comment, chromedp.ByQuery),
+		chromedp.OuterHTML(`body`, &body, chromedp.ByQuery),
 	)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return comment
+	return body
 }
 
-func is_old_url(url, date_jqSelector string) bool {
+func is_old_url(myurl string, date_jqSelector string) bool {
 	tmp_date := "/11/2023"
-	resp, err := http.Get(url)
+	resp, err := http.Get(myurl)
 	if err != nil {
 		log.Println(err)
 	}
 	defer resp.Body.Close()
 	cdoc, _ := goquery.NewDocumentFromReader(resp.Body)
 	return !strings.Contains(cdoc.Find(date_jqSelector).Text(), tmp_date)
-
 }
 
-func rank_vnexpress(url string) (map[string]int, error) {
+func like_collector(myurl string, s site_attributes) (map[string]int, error) {
 	var result = make(map[string]int)
+	button_querySelector := s.button_querySelector
+	like_box_querySelector := s.like_box_querySelector
+	like_count_querySelector := s.like_count_querySelector
+	extra_wait_milisec := s.extra_wait_milisec
+	date_querySelector := s.date_querySelector
 
-	if is_old_url(url, ".date") {
+	if is_old_url(myurl, date_querySelector) {
 		return result, errors.New("skipped old page")
 	}
 
 	//Else, continue
 
-	js := `
-		if (document.querySelector('.txt_666')) {
-			document.querySelector('.txt_666').click();
-		}
-	`
-	comment := click_n_get(url, js, 1)
+	js := fmt.Sprintf("if (document.querySelector('%s')) { document.querySelector('%s').click();}", button_querySelector, button_querySelector)
+	body := click_n_get(myurl, js, extra_wait_milisec)
 	//vnexpress doesn't need to have any extra wait.
 	//I put it 1 milliseconds here to satisfy function definition :|
 
 	//The selector that we use to select the needed content in console
 	//for example: document.querySelector(".number")
-	like_box_selector := ".reactions-total"
-	like_count_selector := ".number"
-	result[url] = count_likes(comment, like_box_selector, like_count_selector)
+	result[myurl] = count_likes(body, like_box_querySelector, like_count_querySelector)
 
 	//result[url] = total_likes
 	return result, nil
 }
 
-func rank_tuoitre(url string) (map[string]int, error) {
-	var result = make(map[string]int)
-	if is_old_url(url, ".detail-time") {
-		return result, errors.New("skipped old page")
-	}
-	//Else, continue
-
-	//Can't set var here because it will raise an error when we click multiple times
-	//I don't know, js things
-	js := `
-		if (document.querySelector('.viewmore-comment')) {
-			document.querySelector('.viewmore-comment').click();
-		}
-	`
-	fullbody := click_n_get(url, js, 2000)
-	//Tuoitre has some lazy load magic that chromedp can't just simply wait by matching selector
-	//I have to use this stupid trick :(
-	//Yes - 2 seconds is pretty safe
-
-	//The selector that we use to select the needed content in console
-	//for example: document.querySelector(".number")
-	like_box_selector := ".totalreact"
-	like_count_selector := ".total"
-	result[url] = count_likes(fullbody, like_box_selector, like_count_selector)
-
-	return result, nil
-}
-
-func count_likes(body_html, like_box_selector, like_count_selector string) (total_likes int) {
+func count_likes(body_html, like_box_querySelector, like_count_querySelector string) (total_likes int) {
 
 	total_likes = 0
 
@@ -235,9 +233,9 @@ func count_likes(body_html, like_box_selector, like_count_selector string) (tota
 	}
 
 	//select 2 class to make sure it's the correct place to check
-	doc.Find(like_box_selector).Each(func(i int, s *goquery.Selection) {
+	doc.Find(like_box_querySelector).Each(func(i int, s *goquery.Selection) {
 		// For each item found, get the number
-		number := s.Find(like_count_selector).Text()
+		number := s.Find(like_count_querySelector).Text()
 		if number != "" {
 			num, err := strconv.Atoi(strings.ReplaceAll(number, ".", ""))
 			if err != nil {
@@ -248,4 +246,13 @@ func count_likes(body_html, like_box_selector, like_count_selector string) (tota
 	})
 
 	return total_likes
+}
+
+func get_hostname(myurl string) (domain string) {
+	xurl, err := url.Parse(myurl)
+	if err != nil {
+		log.Fatal(err)
+	}
+	hostname := strings.TrimPrefix(xurl.Hostname(), "www.")
+	return hostname
 }
