@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"errors"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -52,12 +54,15 @@ func main() {
 		url = strings.TrimSpace(url)
 		if !bytes.Contains(result, []byte(url)) {
 			log.Printf("Start checking %s\n", url)
-			result, err := rank_vnexpress(url)
-			check(err)
-			for k, v := range result {
+			score_result, err := rank_vnexpress(url)
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+			for k, v := range score_result {
 				f.WriteString(k + ":" + strconv.Itoa(v) + "\n")
 			}
-			log.Printf("Done: %s:%d", url, result[url])
+			log.Printf("Done: %s:%d", url, score_result[url])
 		}
 	}
 
@@ -132,6 +137,10 @@ func rank_vnexpress(url string) (map[string]int, error) {
 	}
 
 	//Parse html. Very vnexpress specific
+
+	if !strings.Contains(doc.Find(".date").Text(), "/11/2023") {
+		return result, errors.New("skipped old page")
+	}
 	doc.Find(".reactions-total").Each(func(i int, s *goquery.Selection) {
 		// For each item found, get the number
 		number := s.Find(".number").Text()
