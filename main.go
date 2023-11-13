@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/chromedp/cdproto/network"
 	"github.com/chromedp/chromedp"
 )
 
@@ -78,6 +79,7 @@ func click_n_get(url, js string) string {
 
 	opts := append(chromedp.DefaultExecAllocatorOptions[:],
 		chromedp.Flag("blink-settings", "imagesEnabled=false"),
+		chromedp.Flag("disable-gpu", true),
 	)
 	// new browser, first tab
 	browserCtx, browserCancel := chromedp.NewExecAllocator(context.Background(), opts...)
@@ -95,7 +97,18 @@ func click_n_get(url, js string) string {
 	defer cancel()
 
 	err := chromedp.Run(ctx,
-
+		network.Enable(),
+		network.SetBlockedURLS([]string{
+			"https://*google*",
+			"https://www.google*",
+			"https://*pubmatic.com*",
+			"https://*adnxs.com*",
+			"https://*doubleclick.net*",
+			"*eclick.vn*",
+			"https://*.vnecdn.net/*like.svg",
+			"https://vnexpress.net/microservice/*",
+			"https://my.vnexpress.net/*",
+		}),
 		chromedp.Navigate(url),
 
 		//Wait for whole body to be ready
@@ -107,9 +120,8 @@ func click_n_get(url, js string) string {
 		// Also can't make a simple loop here. Need to check chromedp syntax a bit
 		// Look silly but ok
 		chromedp.Evaluate(js, empty_place_holder),
-		chromedp.Sleep(time.Millisecond*50),
 		chromedp.Evaluate(js, empty_place_holder),
-		chromedp.Sleep(time.Millisecond*50),
+		chromedp.Evaluate(js, empty_place_holder),
 		chromedp.Evaluate(js, empty_place_holder),
 		chromedp.Sleep(time.Millisecond*50),
 
