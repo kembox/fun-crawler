@@ -71,7 +71,8 @@ func main() {
 
 		if !bytes.Contains(checked_urls, []byte(url)) {
 			log.Printf("Start checking %s\n", url)
-			score_result, err := rank_vnexpress(url)
+			//score_result, err := rank_vnexpress(url)
+			score_result, err := rank_tuoitre(url)
 			if err != nil {
 				fmt.Println(err)
 				continue
@@ -141,6 +142,7 @@ func click_n_get(url, js string) string {
 		chromedp.Evaluate(js, empty_place_holder),
 		chromedp.Evaluate(js, empty_place_holder),
 		chromedp.Evaluate(js, empty_place_holder),
+		chromedp.Evaluate(js, empty_place_holder),
 		chromedp.Sleep(time.Millisecond*50),
 
 		chromedp.OuterHTML(`*`, &comment, chromedp.ByQuery),
@@ -161,26 +163,6 @@ func is_old_url(url, date_jqSelector string) bool {
 	cdoc, _ := goquery.NewDocumentFromReader(resp.Body)
 	return !strings.Contains(cdoc.Find(date_jqSelector).Text(), tmp_date)
 
-}
-
-func rank_tuoitre(url string) (map[string]int, error) {
-	var result = make(map[string]int)
-	if is_old_url(url, ".detail-time") {
-		return result, errors.New("skipped old page")
-	}
-	//Else, continue
-
-	//Can't set var here because it will raise an error when we click multiple times
-	//I don't know, js things
-	js := `
-		if (document.querySelector('.commentpopupall')) {
-			document.querySelector('.commentpopupall').click();
-		}
-	`
-	fullbody := click_n_get(url, js)
-	fmt.Println(fullbody)
-
-	return result, nil
 }
 
 func rank_vnexpress(url string) (map[string]int, error) {
@@ -209,6 +191,34 @@ func rank_vnexpress(url string) (map[string]int, error) {
 	return result, nil
 }
 
+func rank_tuoitre(url string) (map[string]int, error) {
+	var result = make(map[string]int)
+	if is_old_url(url, ".detail-time") {
+		return result, errors.New("skipped old page")
+	}
+	//Else, continue
+
+	//Can't set var here because it will raise an error when we click multiple times
+	//I don't know, js things
+	js := `
+		if (document.querySelector('.viewmore-comment')) {
+			document.querySelector('.viewmore-comment').click();
+		}
+	`
+	fullbody := click_n_get(url, js)
+	//fmt.Println(fullbody)
+
+	//The selector that we use to select the needed content in console
+	//for example: document.querySelector(".number")
+	//like_box_selector := ".totalreact"
+	//like_box_selector := ".listcm"
+	like_box_selector := ".wrapreact"
+	like_count_selector := ".totalreact"
+	result[url] = count_likes(fullbody, like_box_selector, like_count_selector)
+
+	return result, nil
+}
+
 func count_likes(body_html, like_box_selector, like_count_selector string) (total_likes int) {
 
 	total_likes = 0
@@ -218,13 +228,14 @@ func count_likes(body_html, like_box_selector, like_count_selector string) (tota
 		log.Fatal(err)
 	}
 
-	//Parse html. Very vnexpress specific
-
+	//select 2 class to make sure it's the correct place to check
+	fmt.Println(doc.Find(".totalreact").Text())
 	doc.Find(like_box_selector).Each(func(i int, s *goquery.Selection) {
 		// For each item found, get the number
 		number := s.Find(like_count_selector).Text()
+		fmt.Println("number: ", number)
 		if number != "" {
-			//fmt.Printf("Total like for this comment %s\n", number)
+			fmt.Printf("Total like for this comment %s\n", number)
 			num, err := strconv.Atoi(strings.ReplaceAll(number, ".", ""))
 			if err != nil {
 				log.Fatal(err)
