@@ -84,10 +84,10 @@ func main() {
 // Open chrome headless to navigate to a url
 // Perform a click action by a custom js file if needed
 func click_n_get(url, js string) string {
-	//Nothing special, just to check how to manage defaults options
 	var comment string
 	var empty_place_holder interface{}
 
+	//Set browser options
 	opts := append(chromedp.DefaultExecAllocatorOptions[:],
 		chromedp.Flag("blink-settings", "imagesEnabled=false"),
 		chromedp.Flag("disable-gpu", true),
@@ -104,11 +104,13 @@ func click_n_get(url, js string) string {
 	defer cancel()
 
 	// create a timeout
-	ctx, cancel = context.WithTimeout(ctx, 10*time.Second)
+	ctx, cancel = context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()
 
+	// Start browsing
 	err := chromedp.Run(ctx,
 		network.Enable(),
+		//Filter some unnecessary traffic
 		network.SetBlockedURLS([]string{
 			"https://*google*",
 			"https://www.google*",
