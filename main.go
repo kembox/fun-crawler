@@ -20,6 +20,8 @@ import (
 	"github.com/chromedp/chromedp"
 )
 
+// The `site_attributes` struct contains different jquery format strings
+// To get to needed location in web pages by `chromedp` and `goquery`
 type site_attributes struct {
 	button_querySelector     string
 	like_box_querySelector   string
@@ -196,6 +198,11 @@ func is_old_url(myurl string, date_jqSelector string) bool {
 	return !strings.Contains(cdoc.Find(date_jqSelector).Text(), tmp_date)
 }
 
+// Navigate to an url by chrome headless
+// Check if the date is relevant
+// Click "more comments" button to show enough data then fetch it
+// Parse html to get total number of likes
+// The `site_attributes` struct contains different jquery format string to get to needed location
 func like_collector(myurl string, s site_attributes) (map[string]int, error) {
 	var result = make(map[string]int)
 	button_querySelector := s.button_querySelector
@@ -208,18 +215,12 @@ func like_collector(myurl string, s site_attributes) (map[string]int, error) {
 		return result, errors.New("skipped old page")
 	}
 
-	//Else, continue
+	button_in_js := fmt.Sprintf("if (document.querySelector('%s')) { document.querySelector('%s').click();}", button_querySelector, button_querySelector)
+	body := click_n_get(myurl, button_in_js, extra_wait_milisec)
+	//For some reasons I can't load full tuoitre's content with chromedp properly. So need to put in some extra sleep
 
-	js := fmt.Sprintf("if (document.querySelector('%s')) { document.querySelector('%s').click();}", button_querySelector, button_querySelector)
-	body := click_n_get(myurl, js, extra_wait_milisec)
-	//vnexpress doesn't need to have any extra wait.
-	//I put it 1 milliseconds here to satisfy function definition :|
-
-	//The selector that we use to select the needed content in console
-	//for example: document.querySelector(".number")
 	result[myurl] = count_likes(body, like_box_querySelector, like_count_querySelector)
 
-	//result[url] = total_likes
 	return result, nil
 }
 
