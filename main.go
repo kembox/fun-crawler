@@ -147,19 +147,47 @@ func click_n_get(url, js string) string {
 	return comment
 }
 
-func rank_vnexpress(url string) (map[string]int, error) {
-	var result = make(map[string]int)
-	var total_likes int
-
+func is_old_url(url, date_jqSelector string) bool {
+	tmp_date := "/11/2023"
 	resp, err := http.Get(url)
 	if err != nil {
 		log.Println(err)
 	}
 	defer resp.Body.Close()
 	cdoc, _ := goquery.NewDocumentFromReader(resp.Body)
-	if !strings.Contains(cdoc.Find(".date").Text(), "/11/2023") {
+	return !strings.Contains(cdoc.Find(date_jqSelector).Text(), tmp_date)
+
+}
+
+func rank_tuoitre(url string) (map[string]int, error) {
+	var result = make(map[string]int)
+	if is_old_url(url, ".detail-time") {
 		return result, errors.New("skipped old page")
 	}
+	//Else, continue
+
+	//Can't set var here because it will raise an error when we click multiple times
+	//I don't know, js things
+	js := `
+		if (document.querySelector('.commentpopupall')) {
+			document.querySelector('.commentpopupall').click();
+		}
+	`
+	fullbody := click_n_get(url, js)
+	fmt.Println(fullbody)
+
+	return result, nil
+}
+
+func rank_vnexpress(url string) (map[string]int, error) {
+	var result = make(map[string]int)
+	var total_likes int
+
+	if is_old_url(url, ".date") {
+		return result, errors.New("skipped old page")
+	}
+
+	//Else, continue
 
 	js := `
 		if (document.querySelector('.txt_666')) {
