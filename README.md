@@ -7,6 +7,10 @@ An exercise to scrape and rank url based on number of "likes" in its comments
 2. Install [tomnomnom/waybackurls](https://github.com/tomnomnom/waybackurls) and [hakrawker](https://github.com/hakluke/hakrawler)
 3. Run `./start.sh tuoitre.vn` or `./start.sh vnexpress.net`
 
+## How fun-crawler works
+
+### The main logic
+1. It reads url[s] from stdin
 ### Generating input urls to check and score
 
 Get input urls from wayback machine using [tomnomnom/waybackurls](https://github.com/tomnomnom/waybackurls)
