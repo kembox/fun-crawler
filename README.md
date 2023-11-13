@@ -1,10 +1,15 @@
 # fun-crawler
 An exercise to scrape and rank url based on number of "likes" in its comments
 
+## Quick start
+
+1. Clone this repo. Build it with: `go build`
+2. Install [tomnomnom/waybackurls](https://github.com/tomnomnom/waybackurls) and [hakrawker](https://github.com/hakluke/hakrawler)
+3. Run `./start.sh tuoitre.vn` or `./start.sh vnexpress.net`
 
 ### Generating input urls to check and score
 
-Get input urls from wayback machine using (tomnomnom/waybackurls)[https://github.com/tomnomnom/waybackurls]
+Get input urls from wayback machine using [tomnomnom/waybackurls](https://github.com/tomnomnom/waybackurls)
 
 ```bash
 waybackurls -dates -no-subs vnexpress.net | fgrep '2023-11-' | fgrep 'html$' | awk '{print $2}' | sort -n | uniq  > wayback.list
@@ -12,7 +17,7 @@ waybackurls -dates -no-subs vnexpress.net | fgrep '2023-11-' | fgrep 'html$' | a
 ( Temporarily get data from Nov 2023 first. Then my crawler will parse date info in url and skip the old one later )
 
 Crawl info directly from the site to get latest urls
-Using (hakrawker)[https://github.com/hakluke/hakrawler]
+Using [hakrawker](https://github.com/hakluke/hakrawler)
 
 ```shell
 echo "https://vnexpress.net" | hakrawler  | fgrep 'https://vnexpress.net' | grep "html$"  | awk '{print $2}' | sort -n | uniq > hakrawler.list

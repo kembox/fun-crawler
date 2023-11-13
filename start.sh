@@ -6,25 +6,39 @@
 domain="$1"
 
 ts=$(date +%Y%m%d%H%M)
-base_dir="/tmp"
-data_dir=${base_dir}/$ts
-results_output=${data_dir}/results.txt
-mkdir -p $data_dir
+base_dir="/tmp/fun_crawler_${ts}"
+log_file=${base_dir}/logs.txt
+input_dir=${base_dir}/input
+results_output=${base_dir}/results.txt
+mkdir -p $base_dir
+mkdir -p $input_dir
 
-function generate_input(
+function log() {
+    echo $(date) "$@" | tee ${log_file}
+}
+
+function wayback() {
     domain="$1"
-    waybackurls -dates -no-subs ${domain} | fgrep '2023-11-' | fgrep 'html$' | awk '{print $2}' | sort -n | uniq  > $data_dir/wayback.list
-    echo "https://${domain}" | hakrawler  | fgrep 'https://${domain}' | grep "html$"  | awk '{print $2}' | sort -n | uniq > $data_dir/hakrawler.list
+    waybackurls -dates -no-subs ${domain} | fgrep '2023-11-' | egrep "html?$" | awk '{print $2}' | sort -n | uniq  > $input_dir/wayback.list
+}
+function by_hakrawler() {
+    domain="$1"
+    echo "https://${domain}" | hakrawler  | grep "https://${domain}" | egrep "html?$"  | awk '{print $2}' | sort -n | uniq > $input_dir/hakrawler.list
 
-    cat $data_dir/* | sort -n | uniq  > $data_dir/ready_to_rank.list
-)
+}
 
-generate_input()
+log "Start processing: base dir will be in ${base_dir}"
 
-#Start scraping url and collect likes
-cat $data_dir/ready_to_rank  | ./fun-crawler -resume -outfile "${results_output}" 
+log "Grabbing ${domain} data from wayback machine"
+wayback $domain 
+log "Crawl ${domain} by hakrawler"
+by_hakrawler $domain
 
-#Sort result
+log "Merging input"
+cat $input_dir/* | sort -n | uniq  > $base_dir/ready_to_rank.list
+
+log "Start scraping url and collect likes"
+cat $base_dir/ready_to_rank.list  | ./fun-crawler -resume -outfile "${results_output}" 
+
+log "Sorting result"
 sort -t ":" -k3 -n ${results_output}
-
-
