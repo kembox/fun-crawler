@@ -55,13 +55,9 @@ var checked_urls_file = "./checked_urls.txt"
 var result_file = "./test_vne_result.txt"
 var checked_urls_file = "./test_checked_urls.txt"
 
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
-}
-
 func main() {
+
+	//Create files to store result and track urls we have checked
 
 	f, err := os.OpenFile(result_file, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
 	if err != nil {
@@ -98,8 +94,9 @@ func main() {
 		hostname := get_hostname(myurl)
 
 		//Log url to checked list
-		fmt.Println(myurl)
 		fc.WriteString(myurl)
+
+		// MAIN LOGIC
 
 		if !bytes.Contains(checked_urls, []byte(myurl)) {
 			log.Printf("Start checking %s\n", myurl)
@@ -115,6 +112,47 @@ func main() {
 		}
 	}
 
+}
+
+// Navigate to an url by chrome headless
+// Check if the date is relevant
+// Click "more comments" button to show enough data then fetch it
+// Parse html to get total number of likes
+// The `site_attributes` struct contains different jquery format string to get to needed location
+func like_collector(myurl string, s site_attributes) (map[string]int, error) {
+	var result = make(map[string]int)
+	button_querySelector := s.button_querySelector
+	like_box_querySelector := s.like_box_querySelector
+	like_count_querySelector := s.like_count_querySelector
+	extra_wait_milisec := s.extra_wait_milisec
+	date_querySelector := s.date_querySelector
+
+	if is_old_url(myurl, date_querySelector) {
+		return result, errors.New("skipped old page")
+	}
+
+	button_in_js := fmt.Sprintf("if (document.querySelector('%s')) { document.querySelector('%s').click();}", button_querySelector, button_querySelector)
+	body := click_n_get(myurl, button_in_js, extra_wait_milisec)
+	//For some reasons I can't load full tuoitre's content with chromedp properly. So need to put in some extra sleep
+
+	result[myurl] = count_likes(body, like_box_querySelector, like_count_querySelector)
+
+	return result, nil
+}
+
+func check(e error) {
+	if e != nil {
+		panic(e)
+	}
+}
+
+func get_hostname(myurl string) (domain string) {
+	xurl, err := url.Parse(myurl)
+	if err != nil {
+		log.Fatal(err)
+	}
+	hostname := strings.TrimPrefix(xurl.Hostname(), "www.")
+	return hostname
 }
 
 // Open chrome headless to navigate to a url
@@ -216,32 +254,6 @@ func is_old_url(myurl string, date_jqSelector string) bool {
 	return t_url.Before(t_lastweek)
 }
 
-// Navigate to an url by chrome headless
-// Check if the date is relevant
-// Click "more comments" button to show enough data then fetch it
-// Parse html to get total number of likes
-// The `site_attributes` struct contains different jquery format string to get to needed location
-func like_collector(myurl string, s site_attributes) (map[string]int, error) {
-	var result = make(map[string]int)
-	button_querySelector := s.button_querySelector
-	like_box_querySelector := s.like_box_querySelector
-	like_count_querySelector := s.like_count_querySelector
-	extra_wait_milisec := s.extra_wait_milisec
-	date_querySelector := s.date_querySelector
-
-	if is_old_url(myurl, date_querySelector) {
-		return result, errors.New("skipped old page")
-	}
-
-	button_in_js := fmt.Sprintf("if (document.querySelector('%s')) { document.querySelector('%s').click();}", button_querySelector, button_querySelector)
-	body := click_n_get(myurl, button_in_js, extra_wait_milisec)
-	//For some reasons I can't load full tuoitre's content with chromedp properly. So need to put in some extra sleep
-
-	result[myurl] = count_likes(body, like_box_querySelector, like_count_querySelector)
-
-	return result, nil
-}
-
 func count_likes(body_html, like_box_querySelector, like_count_querySelector string) (total_likes int) {
 
 	total_likes = 0
@@ -265,13 +277,4 @@ func count_likes(body_html, like_box_querySelector, like_count_querySelector str
 	})
 
 	return total_likes
-}
-
-func get_hostname(myurl string) (domain string) {
-	xurl, err := url.Parse(myurl)
-	if err != nil {
-		log.Fatal(err)
-	}
-	hostname := strings.TrimPrefix(xurl.Hostname(), "www.")
-	return hostname
 }
