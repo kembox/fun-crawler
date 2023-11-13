@@ -8,7 +8,7 @@ domain="$1"
 ts=$(date +%Y%m%d%H%M)
 base_dir="/tmp"
 data_dir=${base_dir}/$ts
-
+results_output=${data_dir}/results.txt
 mkdir -p $data_dir
 
 function generate_input(
@@ -22,5 +22,9 @@ function generate_input(
 generate_input()
 
 #Start scraping url and collect likes
-cat $data_dir/ready_to_rank  | ./fun_crawler  
+cat $data_dir/ready_to_rank  | ./fun-crawler -resume -outfile "${results_output}" 
+
+#Sort result
+sort -t ":" -k3 -n ${results_output}
+
 

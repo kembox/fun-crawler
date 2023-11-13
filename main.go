@@ -49,11 +49,6 @@ var sites map[string]site_attributes = map[string]site_attributes{
 	},
 }
 
-/*
-var result_file = "./test_vne_result.txt"
-var checked_urls_file = "./test_checked_urls.txt"
-*/
-
 func main() {
 
 	var result_file string
@@ -89,6 +84,11 @@ func main() {
 		myurl = strings.TrimSpace(myurl)
 
 		hostname := get_hostname(myurl)
+		_, ok := sites[hostname]
+		if !ok {
+			log.Printf("We don't support %s yet. Skipped to the next url", hostname)
+			continue
+		}
 
 		// MAIN LOGIC
 
