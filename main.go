@@ -25,8 +25,12 @@ func check(e error) {
 	}
 }
 
+/*
 var result_file = "./vne_result.txt"
 var checked_urls_file = "./checked_urls.txt"
+*/
+var result_file = "./test_vne_result.txt"
+var checked_urls_file = "./test_checked_urls.txt"
 
 func main() {
 
@@ -181,7 +185,6 @@ func rank_tuoitre(url string) (map[string]int, error) {
 
 func rank_vnexpress(url string) (map[string]int, error) {
 	var result = make(map[string]int)
-	var total_likes int
 
 	if is_old_url(url, ".date") {
 		return result, errors.New("skipped old page")
@@ -196,16 +199,30 @@ func rank_vnexpress(url string) (map[string]int, error) {
 	`
 	comment := click_n_get(url, js)
 
-	doc, err := goquery.NewDocumentFromReader(strings.NewReader(comment))
+	//The selector that we use to select the needed content in console
+	//for example: document.querySelector(".number")
+	like_box_selector := ".reactions-total"
+	like_count_selector := ".number"
+	result[url] = count_likes(comment, like_box_selector, like_count_selector)
+
+	//result[url] = total_likes
+	return result, nil
+}
+
+func count_likes(body_html, like_box_selector, like_count_selector string) (total_likes int) {
+
+	total_likes = 0
+
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(body_html))
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	//Parse html. Very vnexpress specific
 
-	doc.Find(".reactions-total").Each(func(i int, s *goquery.Selection) {
+	doc.Find(like_box_selector).Each(func(i int, s *goquery.Selection) {
 		// For each item found, get the number
-		number := s.Find(".number").Text()
+		number := s.Find(like_count_selector).Text()
 		if number != "" {
 			//fmt.Printf("Total like for this comment %s\n", number)
 			num, err := strconv.Atoi(strings.ReplaceAll(number, ".", ""))
@@ -216,6 +233,5 @@ func rank_vnexpress(url string) (map[string]int, error) {
 		}
 	})
 
-	result[url] = total_likes
-	return result, nil
+	return total_likes
 }
