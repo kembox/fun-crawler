@@ -26,19 +26,26 @@ func check(e error) {
 }
 
 var result_file = "./vne_result.txt"
+var checked_urls_file = "./checked_urls.txt"
 
 func main() {
 
-	//result_file := "./score_result.txt"
 	f, err := os.OpenFile(result_file, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
 	if err != nil {
 		panic(err)
 	}
 	defer f.Close()
 
+	fc, err := os.OpenFile(checked_urls_file, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
+	if err != nil {
+		panic(err)
+	}
+	defer fc.Close()
+
+	checked_urls, cerr := os.ReadFile(checked_urls_file)
+	check(cerr)
+
 	urls := bufio.NewReader(os.Stdin)
-	result, err := os.ReadFile(result_file)
-	check(err)
 
 	// Read urls from input, check if we had result already to decide to get and score
 	// So we can resume from the previous run
@@ -54,7 +61,11 @@ func main() {
 			break
 		}
 		url = strings.TrimSpace(url)
-		if !bytes.Contains(result, []byte(url)) {
+
+		//Log url to checked list
+		fc.WriteString(url)
+
+		if !bytes.Contains(checked_urls, []byte(url)) {
 			log.Printf("Start checking %s\n", url)
 			score_result, err := rank_vnexpress(url)
 			if err != nil {
@@ -119,6 +130,7 @@ func click_n_get(url, js string) string {
 		// click show more comment . Don't know how to speed this up in js part yet
 		// Also can't make a simple loop here. Need to check chromedp syntax a bit
 		// Look silly but ok
+		chromedp.Evaluate(js, empty_place_holder),
 		chromedp.Evaluate(js, empty_place_holder),
 		chromedp.Evaluate(js, empty_place_holder),
 		chromedp.Evaluate(js, empty_place_holder),
