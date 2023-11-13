@@ -178,7 +178,7 @@ func click_n_get(url, js string, extra_wait_milisec int) string {
 	defer cancel()
 
 	// create a timeout
-	ctx, cancel = context.WithTimeout(ctx, 30*time.Second)
+	ctx, cancel = context.WithTimeout(ctx, 15*time.Second)
 	defer cancel()
 
 	// Start browsing
@@ -221,7 +221,8 @@ func click_n_get(url, js string, extra_wait_milisec int) string {
 		chromedp.OuterHTML(`body`, &body, chromedp.ByQuery),
 	)
 	if err != nil {
-		log.Fatal(err)
+		//log.Fatal(err)
+		log.Printf("%s got %v\n", url, err)
 	}
 	return body
 }
