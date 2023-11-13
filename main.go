@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net/http"
 	"os"
 	"strconv"
 	"strings"
@@ -124,6 +125,16 @@ func rank_vnexpress(url string) (map[string]int, error) {
 	var result = make(map[string]int)
 	var total_likes int
 
+	resp, err := http.Get("http://example.com/")
+	if err != nil {
+		log.Println(err)
+	}
+	defer resp.Body.Close()
+	cdoc, _ := goquery.NewDocumentFromReader(resp.Body)
+	if !strings.Contains(cdoc.Find(".date").Text(), "/11/2023") {
+		return result, errors.New("skipped old page")
+	}
+
 	js := `
 		if (document.querySelector('.txt_666')) {
 			document.querySelector('.txt_666').click();
@@ -138,9 +149,6 @@ func rank_vnexpress(url string) (map[string]int, error) {
 
 	//Parse html. Very vnexpress specific
 
-	if !strings.Contains(doc.Find(".date").Text(), "/11/2023") {
-		return result, errors.New("skipped old page")
-	}
 	doc.Find(".reactions-total").Each(func(i int, s *goquery.Selection) {
 		// For each item found, get the number
 		number := s.Find(".number").Text()
