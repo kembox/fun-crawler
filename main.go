@@ -248,6 +248,7 @@ func is_old_url(myurl string, date_jqSelector string) bool {
 		//There are url that doesn't have date info
 		//https://vnexpress.net/cam-nang-du-lich-can-gio-4673430.html
 		//Most likely ads so skip them
+		log.Println("Could not detect date")
 		return true
 	}
 
