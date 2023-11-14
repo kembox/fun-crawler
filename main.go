@@ -216,6 +216,8 @@ func click_n_get(url, js string, extra_wait_milisec int) string {
 		chromedp.Evaluate(js, nil),
 		chromedp.Evaluate(js, nil),
 		chromedp.Evaluate(js, nil),
+		chromedp.Evaluate(js, nil),
+		chromedp.Evaluate(js, nil),
 		chromedp.Sleep(time.Millisecond*time.Duration(extra_wait_milisec)),
 		chromedp.WaitVisible(`body`, chromedp.ByQuery),
 
