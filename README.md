@@ -36,7 +36,7 @@ An exercise to scrape and rank url based on number of "likes" in its comments
 Get input urls from wayback machine using [tomnomnom/waybackurls](https://github.com/tomnomnom/waybackurls)
 
 ```bash
-waybackurls -dates -no-subs vnexpress.net | fgrep '2023-11-' | fgrep 'html$' | awk '{print $2}' | sort -n | uniq  > wayback.list
+waybackurls -dates -no-subs vnexpress.net | fgrep '2023-11-' | egrep "html?$" | awk '{print $2}' | sort -n | uniq  > wayback.list
 ```
 ( Temporarily get data from Nov 2023 first. Then my crawler will parse date info in url and skip the old one later )
 
@@ -44,7 +44,7 @@ Crawl info directly from the site to get latest urls
 Using [hakrawker](https://github.com/hakluke/hakrawler)
 
 ```shell
-echo "https://vnexpress.net" | hakrawler  | fgrep 'https://vnexpress.net' | grep "html$"  | awk '{print $2}' | sort -n | uniq > hakrawler.list
+echo "https://vnexpress.net" | hakrawler  | fgrep 'https://vnexpress.net' | egrep "html?$"  | awk '{print $2}' | sort -n | uniq > hakrawler.list
 ```
 
 Merge those 2 list:
@@ -64,4 +64,3 @@ cat ready_to_rank_list | ./fun_crawler > results.txt
 cat results | sort -t ':' -k3 -n | tail -10
 ```
 See my quickstart [start.sh](https://github.com/kembox/fun-crawler/blob/main/start.sh) script for more info
-
