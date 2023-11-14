@@ -56,7 +56,7 @@ cat wayback.list hakrawler.list | sort -n | uniq > ready_to_rank.list
 
 - pipe through my fun-crawler to get url:number_of_likes data
 ```shell
-cat ready_to_rank_list | ./fun_crawler > results.txt
+cat ready_to_rank_list | ./fun_crawler -resume -outfile "file_location_of_your_choice"
 ```
 
 - Sort top 10
