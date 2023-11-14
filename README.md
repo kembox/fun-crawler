@@ -31,7 +31,7 @@ An exercise to scrape and rank url based on number of "likes" in its comments
 - Consider speed up process by goroutines. Though we can be blocked 
 - Check if we can have smarter waiting mechanism while loading page. So far we wait for full body or static sleep because there are too many edge cases and I have quite a time constraint
 
-### Generating input urls to check and score
+## How to generate input urls to check and score
 
 Get input urls from wayback machine using [tomnomnom/waybackurls](https://github.com/tomnomnom/waybackurls)
 
@@ -63,5 +63,5 @@ cat ready_to_rank_list | ./fun_crawler > results.txt
 ```shell
 cat results | sort -t ':' -k3 -n | tail -10
 ```
-
+See my quickstart [start.sh](https://github.com/kembox/fun-crawler/blob/main/start.sh) script for more info
 
