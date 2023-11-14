@@ -68,10 +68,10 @@ See my quickstart [start.sh](https://github.com/kembox/fun-crawler/blob/main/sta
 ### Sample output
 
 ```
+https://vnexpress.net/nguoi-phu-nu-mo-3-quan-com-2-000-dong-de-tra-on-doi-4675595.html:6174
+https://vnexpress.net/de-xuat-can-nhac-quy-dinh-cam-nguoi-co-nong-do-con-lai-xe-4675223.html:9299
 https://vnexpress.net/de-xuat-can-nhac-quy-dinh-da-uong-ruou-bia-khong-lai-xe-4675223.html:9299
 https://vnexpress.net/can-lang-nghe-du-luan-ve-phim-dat-rung-phuong-nam-thay-vi-doi-xu-ly-4674242-tong-thuat.html:9666
-https://vnexpress.net/can-lang-nghe-du-luan-ve-phim-dat-rung-phuong-nam-thay-vi-doi-xu-ly-4674242-tong-thuat.html:9666
-https://vnexpress.net/can-lang-nghe-du-luan-ve-phim-dat-rung-phuong-nam-thay-vi-doi-xu-ly-4674242.html:9666
 https://vnexpress.net/can-lang-nghe-du-luan-ve-phim-dat-rung-phuong-nam-thay-vi-doi-xu-ly-4674242.html:9666
 https://vnexpress.net/quoc-hoi-tiep-tuc-chat-van-cac-bo-truong-y-te-giao-duc-van-hoa-4674242.html:9666
 https://vnexpress.net/co-nen-ly-hon-khi-vo-cai-me-chong-4674713.html:9889
