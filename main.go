@@ -241,7 +241,8 @@ func is_old_url(myurl string, date_jqSelector string) bool {
 		log.Println(err)
 	}
 	defer resp.Body.Close()
-	cdoc, _ := goquery.NewDocumentFromReader(resp.Body)
+	cdoc, err := goquery.NewDocumentFromReader(resp.Body)
+	check(err)
 	article_date := cdoc.Find(date_jqSelector).Text()
 	//fmt.Println("article date: ", article_date)
 
