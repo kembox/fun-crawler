@@ -48,12 +48,13 @@ var sites map[string]site_attributes = map[string]site_attributes{
 	},
 }
 
-/*
 var result_file = "./vne_result.txt"
 var checked_urls_file = "./checked_urls.txt"
-*/
+
+/*
 var result_file = "./test_vne_result.txt"
 var checked_urls_file = "./test_checked_urls.txt"
+*/
 
 func main() {
 
@@ -93,12 +94,12 @@ func main() {
 
 		hostname := get_hostname(myurl)
 
-		//Log url to checked list
-		fc.WriteString(myurl)
-
 		// MAIN LOGIC
 
 		if !bytes.Contains(checked_urls, []byte(myurl)) {
+			//Log url to checked list
+			fc.WriteString(myurl + "\n")
+
 			log.Printf("Start checking %s\n", myurl)
 			score_result, err := like_collector(myurl, sites[hostname])
 			if err != nil {
@@ -242,7 +243,8 @@ func is_old_url(myurl string, date_jqSelector string) bool {
 	article_date := cdoc.Find(date_jqSelector).Text()
 	//fmt.Println("article date: ", article_date)
 
-	r, _ := regexp.Compile(`[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}`)
+	r, err := regexp.Compile(`[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}`)
+	check(err)
 
 	date := string(r.Find([]byte(article_date)))
 	if date == "" {
