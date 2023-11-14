@@ -25,7 +25,7 @@ An exercise to scrape and rank url based on number of "likes" in its comments
   - Filter unnecessary resources by [cdproto/network](https://pkg.go.dev/github.com/chromedp/cdproto/network)
   - Perform several clicks to show all comments in comment sections. 
   - Return page data. 
-4. use `goquery` to parse html and alculate the total number of "likes" based on some predefined querySelector for the domains I current supported. See [this](https://www.w3schools.com/cssref/css_selectors.php) for more info about querySelector if you're not familiar with it ( Me too )
+4. use `goquery` to parse html and calculate the total number of "likes" based on some predefined querySelector for the domains I current supported. See [this](https://www.w3schools.com/cssref/css_selectors.php) for more info about querySelector if you're not familiar with it ( Me too )
 
 ### TODO
 - Consider speed up process by goroutines. Though we can be blocked 
