@@ -93,7 +93,7 @@ func main() {
 		// MAIN LOGIC
 
 		if resume {
-			var checked_urls_file = "./checked_urls.txt"
+			var checked_urls_file = "/tmp/checked_urls.txt"
 			fc, err := os.OpenFile(checked_urls_file, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
 			if err != nil {
 				panic(err)
