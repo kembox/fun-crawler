@@ -64,3 +64,18 @@ cat ready_to_rank_list | ./fun_crawler > results.txt
 cat results | sort -t ':' -k3 -n | tail -10
 ```
 See my quickstart [start.sh](https://github.com/kembox/fun-crawler/blob/main/start.sh) script for more info
+
+### Sample output
+
+```
+https://vnexpress.net/de-xuat-can-nhac-quy-dinh-da-uong-ruou-bia-khong-lai-xe-4675223.html:9299
+https://vnexpress.net/can-lang-nghe-du-luan-ve-phim-dat-rung-phuong-nam-thay-vi-doi-xu-ly-4674242-tong-thuat.html:9666
+https://vnexpress.net/can-lang-nghe-du-luan-ve-phim-dat-rung-phuong-nam-thay-vi-doi-xu-ly-4674242-tong-thuat.html:9666
+https://vnexpress.net/can-lang-nghe-du-luan-ve-phim-dat-rung-phuong-nam-thay-vi-doi-xu-ly-4674242.html:9666
+https://vnexpress.net/can-lang-nghe-du-luan-ve-phim-dat-rung-phuong-nam-thay-vi-doi-xu-ly-4674242.html:9666
+https://vnexpress.net/quoc-hoi-tiep-tuc-chat-van-cac-bo-truong-y-te-giao-duc-van-hoa-4674242.html:9666
+https://vnexpress.net/co-nen-ly-hon-khi-vo-cai-me-chong-4674713.html:9889
+https://vnexpress.net/bo-truong-nguyen-van-hung-can-xu-ly-nguoi-boi-xau-phim-dat-rung-phuong-nam-4674165.html:10173
+https://vnexpress.net/ong-pham-nhat-vuong-gap-ty-phu-giau-thu-hai-an-do-4674636.html:11443
+https://vnexpress.net/tai-xe-oto-tong-lien-hoan-o-sai-gon-khai-vua-nhau-xong-4676224.html:13668
+```
