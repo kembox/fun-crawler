@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -48,9 +49,6 @@ var sites map[string]site_attributes = map[string]site_attributes{
 	},
 }
 
-var result_file = "./vne_result.txt"
-var checked_urls_file = "./checked_urls.txt"
-
 /*
 var result_file = "./test_vne_result.txt"
 var checked_urls_file = "./test_checked_urls.txt"
@@ -58,22 +56,20 @@ var checked_urls_file = "./test_checked_urls.txt"
 
 func main() {
 
-	//Create files to store result and track urls we have checked
+	var result_file string
+	flag.StringVar(&result_file, "outfile", "./result.txt", "File location to store result")
 
+	var resume bool
+	flag.BoolVar(&resume, "resume", false, "To save checked urls to a file so we can skipped urls which is checked then continue")
+
+	flag.Parse()
+
+	//Create files to store result
 	f, err := os.OpenFile(result_file, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
 	if err != nil {
 		panic(err)
 	}
 	defer f.Close()
-
-	fc, err := os.OpenFile(checked_urls_file, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
-	if err != nil {
-		panic(err)
-	}
-	defer fc.Close()
-
-	checked_urls, cerr := os.ReadFile(checked_urls_file)
-	check(cerr)
 
 	myurls := bufio.NewReader(os.Stdin)
 
@@ -96,21 +92,31 @@ func main() {
 
 		// MAIN LOGIC
 
-		if !bytes.Contains(checked_urls, []byte(myurl)) {
-			//Log url to checked list
-			fc.WriteString(myurl + "\n")
-
-			log.Printf("Start checking %s\n", myurl)
-			score_result, err := like_collector(myurl, sites[hostname])
+		if resume {
+			var checked_urls_file = "./checked_urls.txt"
+			fc, err := os.OpenFile(checked_urls_file, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
 			if err != nil {
-				log.Println(err)
-				continue
+				panic(err)
 			}
-			for k, v := range score_result {
-				f.WriteString(k + ":" + strconv.Itoa(v) + "\n")
+			defer fc.Close()
+			checked_urls, cerr := os.ReadFile(checked_urls_file)
+			check(cerr)
+			if !bytes.Contains(checked_urls, []byte(myurl)) {
+				//Log url to checked list
+				fc.WriteString(myurl + "\n")
 			}
-			log.Printf("Done: %s:%d", myurl, score_result[myurl])
 		}
+
+		log.Printf("Start checking %s\n", myurl)
+		score_result, err := like_collector(myurl, sites[hostname])
+		if err != nil {
+			log.Println(err)
+			continue
+		}
+		for k, v := range score_result {
+			f.WriteString(k + ":" + strconv.Itoa(v) + "\n")
+		}
+		log.Printf("Done: %s:%d", myurl, score_result[myurl])
 	}
 
 }
@@ -262,7 +268,7 @@ func is_old_url(myurl string, date_jqSelector string) bool {
 
 	t_url, err := time.Parse("02/01/2006", date)
 	check(err)
-	t_lastweek := time.Now().AddDate(0, 0, -7)
+	t_lastweek := time.Now().AddDate(0, 0, -8)
 	//fmt.Println(t_url)
 	//fmt.Println(t_lastweek)
 	return t_url.Before(t_lastweek)
