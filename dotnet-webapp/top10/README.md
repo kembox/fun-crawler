@@ -19,7 +19,7 @@ tuoitre.vn  vnexpress.net
 ## How to setup
 
 ### Quick start
-- Copy this folder to somewhere in your server and run:
+- Copy this folder to somewhere in your server, cd there and run:
 ```shell
 dotnet run
 ```
@@ -40,7 +40,7 @@ dotnet run
 ```
 dotnet new webapp {folder_of_your_choice}
 ```
-- Copy and place [Report.cshtml](https://github.com/kembox/fun-crawler/blob/main/dotnet-webapp/top10/Pages/Report.cshtml) and [Report.cshtml.cs](https://github.com/kembox/fun-crawler/blob/main/dotnet-webapp/top10/Pages/Report.cshtml.cs) to your `Pages` folder. 
+- Copy and place [Report.cshtml](https://github.com/kembox/fun-crawler/blob/main/dotnet-webapp/top10/Pages/Report.cshtml) and [Report.cshtml.cs](https://github.com/kembox/fun-crawler/blob/main/dotnet-webapp/top10/Pages/Report.cshtml.cs) into your `Pages` folder. 
 - Run `dotnet run`. Depends on your [launchSettings](https://github.com/kembox/fun-crawler/blob/main/dotnet-webapp/top10/Properties/launchSettings.json) your app can start listening on another port than 5184.
 
 ### Logic 
