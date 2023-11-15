@@ -15,7 +15,7 @@ mkdir -p $input_dir
 
 
 function log() {
-    echo $(date) "$@" | tee ${log_file}
+    echo $(date) "$@" | tee -a ${log_file}
 }
 
 function wayback() {
