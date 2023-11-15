@@ -24,7 +24,7 @@ function wayback() {
 }
 function by_hakrawler() {
     domain="$1"
-    echo "https://${domain}" | hakrawler  | grep "https://${domain}" | egrep "html?$"  | awk '{print $2}' | sort -n | uniq > $input_dir/${domain}_hakrawler.list
+    echo "https://${domain}" | hakrawler  | grep "https://${domain}" | egrep "html?$"  |  sort -n | uniq > $input_dir/${domain}_hakrawler.list
 
 }
 
