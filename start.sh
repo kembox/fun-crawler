@@ -40,7 +40,7 @@ log "Merging input"
 cat $input_dir/* | sort -n | uniq  | grep -v "^$" > $base_dir/ready_to_rank.list
 
 log "Start scraping url and collect likes"
-cat $base_dir/ready_to_rank.list  | ./fun-crawler -resume -outfile "${results_output}" 
+cat $base_dir/ready_to_rank.list  | ./fun-crawler -resume -outfile "${results_output}" >> $log_file 2>&1
 
 log "Sorting result"
 sort -t " " -k2 -n ${results_output} -r | head -10
