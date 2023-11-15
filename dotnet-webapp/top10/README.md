@@ -40,7 +40,10 @@ dotnet run
 ```
 dotnet new webapp {folder_of_your_choice}
 ```
-- Copy and place [Report.cshtml](https://github.com/kembox/fun-crawler/blob/main/dotnet-webapp/top10/Pages/Report.cshtml) and [Report.cshtml.cs](https://github.com/kembox/fun-crawler/blob/main/dotnet-webapp/top10/Pages/Report.cshtml.cs) into your `Pages` folder. 
+- Copy and place following files into your `Pages` folder.
+    - [Report.cshtml](https://github.com/kembox/fun-crawler/blob/main/dotnet-webapp/top10/Pages/Report.cshtml)
+    - [Report.cshtml.cs](https://github.com/kembox/fun-crawler/blob/main/dotnet-webapp/top10/Pages/Report.cshtml.cs).
+    - [Index.cshtml](https://github.com/kembox/fun-crawler/blob/main/dotnet-webapp/top10/Pages/Index.cshtml)
 - Run `dotnet run`. Depends on your [launchSettings](https://github.com/kembox/fun-crawler/blob/main/dotnet-webapp/top10/Properties/launchSettings.json) your app can start listening on another port than 5184.
 
 ### Logic 
