@@ -1,0 +1,49 @@
+﻿@page "/Reports"
+@model ReportModel
+@{
+    var reports = new Dictionary<string,string[]>();
+    var reports_dir = "/var/fun-crawler/reports/";
+    char[] delimiterChar = {' '};
+
+    List<string> Domains = new List<string> {
+            "vnexpress.net",
+            "tuoitre.vn"
+        };
+
+    foreach (var domain in Domains ) {
+        var dataFile = reports_dir + domain;
+        if (System.IO.File.Exists(dataFile)) {
+            reports[domain] = System.IO.File.ReadAllLines(dataFile);
+        }
+        else {
+            // File does not exist.
+            Console.WriteLine("The file does not exist.");
+        }
+    }
+    
+
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Displaying top 10 articles with most likes last week</title>
+</head>
+<body>
+    <div>
+        <h1>Top 10 articles with most likes</h1>
+            @foreach(string domain in Domains) {
+                <h1> @domain </h1>
+                <ol>
+                @foreach (string dataLine in reports[domain]) {
+                <li>
+                    <ul>
+                        <p><a href=@(dataLine.Split(delimiterChar)[0])>@(dataLine.Split(delimiterChar)[0])</a> @(dataLine.Split(delimiterChar)[1]) likes</p>
+                    </ul>
+                </li>
+                }
+                </ol>
+            }
+    </div>
+</body>
+</html>
