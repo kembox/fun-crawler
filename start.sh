@@ -36,7 +36,7 @@ log "Crawl ${domain} by hakrawler"
 by_hakrawler $domain
 
 log "Merging input"
-cat $input_dir/* | sort -n | uniq  > $base_dir/ready_to_rank.list
+cat $input_dir/* | sort -n | uniq  | grep -v "^$" > $base_dir/ready_to_rank.list
 
 log "Start scraping url and collect likes"
 cat $base_dir/ready_to_rank.list  | ./fun-crawler -resume -outfile "${results_output}" 
