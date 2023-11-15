@@ -44,7 +44,7 @@ waybackurls -dates -no-subs vnexpress.net | fgrep '2023-11-' | egrep "html?$" | 
 Using [hakrawker](https://github.com/hakluke/hakrawler)
 
 ```shell
-echo "https://vnexpress.net" | hakrawler  | fgrep 'https://vnexpress.net' | egrep "html?$"  | awk '{print $2}' | sort -n | uniq > hakrawler.list
+echo "https://vnexpress.net" | hakrawler  | fgrep 'https://vnexpress.net' | egrep "html?$" | sort -n | uniq > hakrawler.list
 ```
 
 - Merge those 2 list:
