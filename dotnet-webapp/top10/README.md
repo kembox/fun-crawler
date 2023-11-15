@@ -1,4 +1,4 @@
-# Simple dotnet webapp to read fun-crawler from files and display it
+## Simple dotnet webapp to read fun-crawler text output from files and display it
 
 ## Environment setup
 - I run it on Ubuntu Linux so we need some packages:
