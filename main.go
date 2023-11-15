@@ -74,7 +74,7 @@ func main() {
 		myurl, err := myurls.ReadString('\n')
 		if err != nil {
 			if err == io.EOF {
-				continue
+				break
 			}
 			log.Fatal(err)
 		}
