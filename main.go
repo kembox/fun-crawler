@@ -114,7 +114,7 @@ func main() {
 			continue
 		}
 		for k, v := range score_result {
-			f.WriteString(k + ":" + strconv.Itoa(v) + "\n")
+			f.WriteString(k + " " + strconv.Itoa(v) + "\n")
 		}
 		log.Printf("Done: %s:%d", myurl, score_result[myurl])
 	}

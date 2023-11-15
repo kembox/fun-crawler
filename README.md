@@ -69,26 +69,26 @@ See my quickstart [start.sh](https://github.com/kembox/fun-crawler/blob/main/sta
 
 ```
 #vnexpress.net
-https://vnexpress.net/nguoi-phu-nu-mo-3-quan-com-2-000-dong-de-tra-on-doi-4675595.html:6174
-https://vnexpress.net/de-xuat-can-nhac-quy-dinh-cam-nguoi-co-nong-do-con-lai-xe-4675223.html:9299
-https://vnexpress.net/de-xuat-can-nhac-quy-dinh-da-uong-ruou-bia-khong-lai-xe-4675223.html:9299
-https://vnexpress.net/can-lang-nghe-du-luan-ve-phim-dat-rung-phuong-nam-thay-vi-doi-xu-ly-4674242-tong-thuat.html:9666
-https://vnexpress.net/can-lang-nghe-du-luan-ve-phim-dat-rung-phuong-nam-thay-vi-doi-xu-ly-4674242.html:9666
-https://vnexpress.net/quoc-hoi-tiep-tuc-chat-van-cac-bo-truong-y-te-giao-duc-van-hoa-4674242.html:9666
-https://vnexpress.net/co-nen-ly-hon-khi-vo-cai-me-chong-4674713.html:9889
-https://vnexpress.net/bo-truong-nguyen-van-hung-can-xu-ly-nguoi-boi-xau-phim-dat-rung-phuong-nam-4674165.html:10173
-https://vnexpress.net/ong-pham-nhat-vuong-gap-ty-phu-giau-thu-hai-an-do-4674636.html:11443
-https://vnexpress.net/tai-xe-oto-tong-lien-hoan-o-sai-gon-khai-vua-nhau-xong-4676224.html:13668
+https://vnexpress.net/nguoi-phu-nu-mo-3-quan-com-2-000-dong-de-tra-on-doi-4675595.html 6174
+https://vnexpress.net/de-xuat-can-nhac-quy-dinh-cam-nguoi-co-nong-do-con-lai-xe-4675223.html 9299
+https://vnexpress.net/de-xuat-can-nhac-quy-dinh-da-uong-ruou-bia-khong-lai-xe-4675223.html 9299
+https://vnexpress.net/can-lang-nghe-du-luan-ve-phim-dat-rung-phuong-nam-thay-vi-doi-xu-ly-4674242-tong-thuat.html 9666
+https://vnexpress.net/can-lang-nghe-du-luan-ve-phim-dat-rung-phuong-nam-thay-vi-doi-xu-ly-4674242.html 9666
+https://vnexpress.net/quoc-hoi-tiep-tuc-chat-van-cac-bo-truong-y-te-giao-duc-van-hoa-4674242.html 9666
+https://vnexpress.net/co-nen-ly-hon-khi-vo-cai-me-chong-4674713.html 9889
+https://vnexpress.net/bo-truong-nguyen-van-hung-can-xu-ly-nguoi-boi-xau-phim-dat-rung-phuong-nam-4674165.html 10173
+https://vnexpress.net/ong-pham-nhat-vuong-gap-ty-phu-giau-thu-hai-an-do-4674636.html 11443
+https://vnexpress.net/tai-xe-oto-tong-lien-hoan-o-sai-gon-khai-vua-nhau-xong-4676224.html 13668
 
 #tuoitre.vn
-https://tuoitre.vn/bi-mat-nao-giup-hang-trung-quoc-giao-cho-khach-viet-nam-qua-nhanh-qua-re-20231107225659139.htm:224
-https://tuoitre.vn/bat-tam-giam-tai-xe-gay-tai-nan-lien-hoan-tong-chet-co-gai-o-thu-duc-20231113131641939.htm:226
-https://tuoitre.vn/bi-to-mua-bai-bao-khoa-hoc-truong-dh-ton-duc-thang-len-tieng-20231110231101767.htm:265
-https://tuoitre.vn/hai-bo-truong-len-tieng-viec-cong-dong-mang-bat-nat-y-nhi-dat-rung-phuong-nam-20231107170646089.htm:373
-https://tuoitre.vn/ngan-ngam-voi-nan-xa-rac-bua-bai-o-pho-di-bo-nguyen-hue-20231113080303766.htm:407
-https://tuoitre.vn/cam-tai-xe-tuyet-doi-khong-co-nong-do-con-trong-hoi-tho-lieu-qua-nghiem-khac-20231110084643579.htm:467
-https://tuoitre.vn/cam-tuyet-doi-nguoi-co-nong-do-con-lai-xe-lieu-qua-nghiem-khac-20231110084643579.htm:467
-https://tuoitre.vn/hang-trieu-giay-phep-lai-xe-dang-su-dung-binh-thuong-vi-sao-phai-doi--20231110142933651.htm:500
-https://tuoitre.vn/cuc-csgt-doi-quy-dinh-dan-choi-bien-so-dep-noi-bi-sup-ham-20231110062012106.htm:527
-https://tuoitre.vn/chua-co-bao-gio-cho-e-nhu-hien-nay-20231112080633584.htm:919
+https://tuoitre.vn/bi-mat-nao-giup-hang-trung-quoc-giao-cho-khach-viet-nam-qua-nhanh-qua-re-20231107225659139.htm 224
+https://tuoitre.vn/bat-tam-giam-tai-xe-gay-tai-nan-lien-hoan-tong-chet-co-gai-o-thu-duc-20231113131641939.htm 226
+https://tuoitre.vn/bi-to-mua-bai-bao-khoa-hoc-truong-dh-ton-duc-thang-len-tieng-20231110231101767.htm 265
+https://tuoitre.vn/hai-bo-truong-len-tieng-viec-cong-dong-mang-bat-nat-y-nhi-dat-rung-phuong-nam-20231107170646089.htm 373
+https://tuoitre.vn/ngan-ngam-voi-nan-xa-rac-bua-bai-o-pho-di-bo-nguyen-hue-20231113080303766.htm 407
+https://tuoitre.vn/cam-tai-xe-tuyet-doi-khong-co-nong-do-con-trong-hoi-tho-lieu-qua-nghiem-khac-20231110084643579.htm 467
+https://tuoitre.vn/cam-tuyet-doi-nguoi-co-nong-do-con-lai-xe-lieu-qua-nghiem-khac-20231110084643579.htm 467
+https://tuoitre.vn/hang-trieu-giay-phep-lai-xe-dang-su-dung-binh-thuong-vi-sao-phai-doi--20231110142933651.htm 500
+https://tuoitre.vn/cuc-csgt-doi-quy-dinh-dan-choi-bien-so-dep-noi-bi-sup-ham-20231110062012106.htm 527
+https://tuoitre.vn/chua-co-bao-gio-cho-e-nhu-hien-nay-20231112080633584.htm 919
 ```
