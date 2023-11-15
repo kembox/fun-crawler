@@ -46,3 +46,6 @@ dotnet new webapp {folder_of_your_choice}
 ### Logic 
 Super simple. I just have a [tiny C# code](https://github.com/kembox/fun-crawler/blob/main/dotnet-webapp/top10/Pages/Report.cshtml#L3-L25) to read data from files and [generate html](https://github.com/kembox/fun-crawler/blob/main/dotnet-webapp/top10/Pages/Report.cshtml#L28-L49) for it. 
 
+A more serious but still simple setup on server can be :
+- A cron to run my crawl script and generate input to a specific folder ( with resume feature enable, every minute, with flock )
+- Reconfigure this dotnet webapp to read data from there. Will need to check input more carefully. 
