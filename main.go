@@ -74,12 +74,12 @@ func main() {
 		myurl, err := myurls.ReadString('\n')
 		if err != nil {
 			if err == io.EOF {
-				break
+				continue
 			}
 			log.Fatal(err)
 		}
 		if len(strings.TrimSpace(myurl)) == 0 {
-			break
+			continue
 		}
 		myurl = strings.TrimSpace(myurl)
 
