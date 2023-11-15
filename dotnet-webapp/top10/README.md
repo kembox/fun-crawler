@@ -20,7 +20,7 @@ tuoitre.vn  vnexpress.net
 
 ### Quick start
 - Copy this folder to somewhere in your server and run:
-```shell`
+```shell
 dotnet run
 ```
 - Setup nginx in front of it `http://127.0.0.1:5184`. For example:
