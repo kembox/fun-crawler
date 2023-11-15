@@ -5,7 +5,7 @@
 
 domain="$1"
 
-ts=$(date +%Y%m%d%H)
+ts=$(date +%Y%m%d)
 base_dir="/var/tmp/fun-crawler/${domain}/${ts}"
 log_file=${base_dir}/logs.txt
 input_dir=${base_dir}/input
