@@ -108,7 +108,7 @@ func main() {
 				//Log url to checked list
 				fc.WriteString(myurl + "\n")
 			} else {
-				log.Println("we already checked this file. Continue")
+				log.Printf("Already checked %s. Continue\n", myurl)
 				continue
 			}
 		}
