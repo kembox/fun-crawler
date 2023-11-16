@@ -107,6 +107,9 @@ func main() {
 			if !bytes.Contains(checked_urls, []byte(myurl)) {
 				//Log url to checked list
 				fc.WriteString(myurl + "\n")
+			} else {
+				log.Println("we already checked this file. Continue")
+				continue
 			}
 		}
 
