@@ -11,7 +11,7 @@ base_dir="/var/tmp/fun-crawler/${domain}/${ts}"
 log_file=${base_dir}/logs.txt
 input_dir=${base_dir}/input
 results_output=${base_dir}/results.txt
-to_publish="/var/tmp/fun-crawler/reports"
+to_publish="/var/fun-crawler/reports"
 mkdir -p $to_publish
 mkdir -p $base_dir
 mkdir -p $input_dir
