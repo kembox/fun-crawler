@@ -11,6 +11,8 @@ base_dir="/var/tmp/fun-crawler/${domain}/${ts}"
 log_file=${base_dir}/logs.txt
 input_dir=${base_dir}/input
 results_output=${base_dir}/results.txt
+to_publish="/var/tmp/fun-crawler/reports"
+mkdir -p $to_publish
 mkdir -p $base_dir
 mkdir -p $input_dir
 
@@ -43,4 +45,4 @@ log "Start scraping url and collect likes"
 cat $base_dir/ready_to_rank.list  | ./fun-crawler -resume -outfile "${results_output}" >> $log_file 2>&1
 
 log "Sorting result"
-sort -t " " -k2 -n ${results_output} -r | head -10
+sort -t " " -k2 -n ${results_output} -r | head -10 > ${to_publish}/${domain}_${ts}
