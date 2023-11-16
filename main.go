@@ -66,7 +66,8 @@ func main() {
 	}
 	defer f.Close()
 
-	var checked_urls_file = "/tmp/checked_urls.txt"
+	currentTime := time.Now()
+	var checked_urls_file = "/tmp/checked_urls_" + currentTime.Format("20060102") + ".txt"
 	fc, err := os.OpenFile(checked_urls_file, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
 	if err != nil {
 		panic(err)
