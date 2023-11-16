@@ -66,6 +66,16 @@ func main() {
 	}
 	defer f.Close()
 
+	var checked_urls_file = "/tmp/checked_urls.txt"
+	fc, err := os.OpenFile(checked_urls_file, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
+	if err != nil {
+		panic(err)
+	}
+	defer fc.Close()
+
+	checked_urls, cerr := os.ReadFile(checked_urls_file)
+	check(cerr)
+
 	myurls := bufio.NewReader(os.Stdin)
 
 	// Read urls from input, check if we had result already to decide to get and score
@@ -79,6 +89,7 @@ func main() {
 			log.Fatal(err)
 		}
 		if len(strings.TrimSpace(myurl)) == 0 {
+			log.Println("Empty url. Continue")
 			continue
 		}
 		myurl = strings.TrimSpace(myurl)
@@ -93,14 +104,6 @@ func main() {
 		// MAIN LOGIC
 
 		if resume {
-			var checked_urls_file = "/tmp/checked_urls.txt"
-			fc, err := os.OpenFile(checked_urls_file, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
-			if err != nil {
-				panic(err)
-			}
-			defer fc.Close()
-			checked_urls, cerr := os.ReadFile(checked_urls_file)
-			check(cerr)
 			if !bytes.Contains(checked_urls, []byte(myurl)) {
 				//Log url to checked list
 				fc.WriteString(myurl + "\n")
