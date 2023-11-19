@@ -46,3 +46,7 @@ cat $base_dir/ready_to_rank.list  | ./fun-crawler -resume -outfile "${results_ou
 
 log "Sorting result"
 sort -t " " -k2 -n ${results_output} -r | head -10 > ${to_publish}/${domain}_${ts}
+if [ $? == 0 ]; then 
+    log "Updating final result"
+    cp -vp ${to_publish}/${domain}_${ts} ${to_publish}/${domain}
+fi
