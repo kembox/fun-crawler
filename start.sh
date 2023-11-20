@@ -1,6 +1,5 @@
 #!/bin/bash
 set -eu
-set -o pipefail
 #Script to automate steps for:
 # - generating url input from wayback machine and crawling directly from the site
 
