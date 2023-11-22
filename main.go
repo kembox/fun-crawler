@@ -109,7 +109,7 @@ func main() {
 				//Log url to checked list
 				fc.WriteString(myurl + "\n")
 			} else {
-				log.Printf("Already checked %s. Continue\n", myurl)
+				//log.Printf("Already checked %s. Continue\n", myurl)
 				continue
 			}
 		}
